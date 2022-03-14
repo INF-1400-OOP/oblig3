@@ -8,7 +8,7 @@ class Loop:
     def __init__(self, width, height, fps):
         self.width, self.height = width, height
         self.fps = fps
-
+        
         self.screen = pg.display.set_mode((self.width, self.height), 0, 32)
 
         # set up a game clock
