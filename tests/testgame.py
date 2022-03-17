@@ -15,7 +15,7 @@ class Wall(pg.sprite.Sprite):
         # self.groups = group1, group2
         super().__init__(group)
         self.image = pg.Surface((TILESIZE, TILESIZE), pg.SRCALPHA)
-        self.image.fill((0, 255, 0))
+        self.image.fill((255, 182, 193))
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
@@ -50,12 +50,15 @@ def update():
     camera.update(player)
 
 def draw(screen):
-    screen.fill((0, 0, 0))
+    screen.fill((60, 60, 60))
+    # screen.blit(bgimg, (0,0))
 
     for sprite in sprites:
         screen.blit(sprite.image, camera.apply(sprite))
     
     pg.display.flip()
+
+# bgimg = pg.image.load("iu.jpeg").convert_alpha()
 
 sprites = pg.sprite.Group()
 walls = pg.sprite.Group()
