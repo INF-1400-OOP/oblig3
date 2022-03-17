@@ -62,12 +62,13 @@ class Loop:
         exit()
 
     def event_handling(self):
-        for event in pg.event.get():
+        for i, event in enumerate(pg.event.get()):
             # quit if exit button pressed
             if event.type == pg.QUIT:
                 self.quit()
             else:
-                self.dispatcher.dispatch(event) 
+                self.dispatcher.dispatch(event)
+                print(i, event)
     
     def keypress_handler(self, event):
         key_input = pg.key.get_pressed()

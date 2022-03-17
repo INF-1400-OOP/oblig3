@@ -8,15 +8,18 @@ class Camera:
 		self.height = height
 
 	def apply(self, entity):
-		return entity.rect.move(self.camera.topleft)
+		print(entity.rect)
+		moved = entity.rect.move(self.camera.topleft)
+		print(moved, "movedf")
+		return moved
 
 	def update(self, target):
 		x = -target.rect.x + int(WIDTH / 2)
 		y = -target.rect.y + int(HEIGHT / 2)
 		# set limits
-		# x = min(0, x) # left
-		# y = min(0, y) # top
-		# x = max(-(self.width - WIDTH), x) # right
-		# y = max(-(self.height - HEIGHT), y) # bottom
+		x = min(0, x) # left
+		y = min(0, y) # top
+		x = max(-(self.width - WIDTH), x) # right
+		y = max(-(self.height - HEIGHT), y) # bottom
 
 		self.camera = pg.Rect(x, y, self.width, self.height)

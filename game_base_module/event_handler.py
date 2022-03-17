@@ -30,8 +30,8 @@ class EventDispatcher:
             raise TypeError(f"Inappropriate arguement {event_handler}, must be of type: {EventHandler}.")
         
         # Ensure no duplicates of handlers
-        elif event_handler.type in self.__handlers:
-            raise DuplicateHandlerError(event_handler)
+        # elif event_handler.type in self.__handlers:
+        #     raise DuplicateHandlerError(event_handler)
 
         # add handler to handlers
         self.__handlers[event_handler.type] = event_handler.handler
@@ -40,6 +40,7 @@ class EventDispatcher:
         """ Dispatches event handler. """
         if event.type in self.__handlers:
             self.__handlers[event.type](event)
+            # print(event.type)
 
 class EventHandler:
     """ Event handler - Create a custom event. Also inspired from lecture notes. 
