@@ -68,7 +68,7 @@ class Loop:
                 self.quit()
             else:
                 self.dispatcher.dispatch(event)
-                print(i, event)
+                # print(i, event)
     
     def keypress_handler(self, event):
         key_input = pg.key.get_pressed()

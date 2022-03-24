@@ -8,10 +8,7 @@ class Camera:
 		self.height = height
 
 	def apply(self, entity):
-		print(entity.rect)
-		moved = entity.rect.move(self.camera.topleft)
-		print(moved, "movedf")
-		return moved
+		return entity.rect.move(self.camera.topleft)
 
 	def update(self, target):
 		x = -target.rect.x + int(WIDTH / 2)

@@ -6,6 +6,9 @@ from os.path import join, dirname
 from game_base_module import *
 from config import *
 from camera import Camera
+from map import Map
+from sprites import Player, Wall
+from custom_events import *
 
 vec = pg.math.Vector2
 
@@ -23,76 +26,52 @@ class Main(Loop):
         # set center of screen
         self.center = vec(self.width // 2, self.height // 2)
 
-        # self.key_handler = EventHandler(pg.KEYDOWN)
-        # self.key_handler.handler = self.keypress
-        # self.dispatcher.register_handler(self.key_handler)
-        self.controls = EventHandler(pg.TEXTINPUT)
-        self.controls.handler = self.keypress
-        self.dispatcher.register_handler(self.controls)
+
+        # self.controls = EventHandler(KEY_HELD_DOWN)
+        # self.controls.handler = self.keypress
+        # self.dispatcher.register_handler(self.controls)
 
     def load_data(self):
-        self.bg = pg.image.load("iu.jpeg").convert_alpha()
-        self.bg_rect = self.bg.get_rect()
+        self.textures = self.prep_images(listdir(join(self.path, "textures")))
+        self.map = Map("testmap2.txt")
+
+    def prep_images(self, imgnames:list[str]) -> dict:
+        out_dict = {}
+        for imgname in imgnames:
+            out_dict[imgname.split(".")[0]] = pg.image.load(join(self.path, "textures", imgname))
+        return out_dict
 
     def new(self):
         """ Called when game is initialized, can also be used for resetting the whole display. """
         self.all_sprites = pg.sprite.Group()
-        self.p = Mover(self)
-        # self.camera = Camera(self.bg_rect.width, self.bg_rect.height)
-        self.camera = Camera(self.bg_rect.width, self.bg_rect.height)
+        self.all_walls = pg.sprite.Group()
+
+        for row, tiles in enumerate(self.map.map):
+            for column, tile in enumerate(tiles):
+                if tile != "." and tile != "p":
+                    Wall([self.all_walls, self.all_sprites], column, row, self.textures[tile])
+                elif tile == "p":
+                    self.player = Player(self, self.all_sprites, column, row, 10, 20, RED)
+
+        self.camera = Camera(self.map.width, self.map.height)
 
     def update(self):
         # update all groups
         self.all_sprites.update()
-        # self.camera.update(self.p)
+        self.camera.update(self.player)
 
     def draw(self):
         # fill screen with background color
         self.screen.fill(BACKGROUND_COLOR)
-        # self.screen.blit(self.bg, (0,0))
 
         # Display FPS in caption
         pg.display.set_caption(f"{self.clock.get_fps():.2f}")
         
-        # for sprite in self.all_sprites:
-        #     self.screen.blit(sprite.image, self.camera.apply(sprite))
+        for sprite in self.all_sprites:
+            self.screen.blit(sprite.image, self.camera.apply(sprite))
 
-        self.all_sprites.draw(self.screen)
         pg.display.flip()
     
-    def keypress(self, event):
-        super().keypress_handler(event)
-        key_input = pg.key.get_pressed()
-
-        if key_input[pg.K_w]:
-            self.p.vel = vec(0, -1)
-        if key_input[pg.K_s]:
-            self.p.vel = vec(0, 1)
-        if key_input[pg.K_a]:
-            self.p.vel = vec(-1, 0)
-        if key_input[pg.K_d]:
-            self.p.vel = vec(1, 0)
-
-class Mover(pg.sprite.Sprite):
-    def __init__(self, game):
-        self.game = game
-        super().__init__(game.all_sprites)
-        self.image = pg.Surface((50, 50), pg.SRCALPHA)
-        self.rect = self.image.get_rect(center=game.center)
-        self.image.fill(GREEN)
-        self.pos = self.rect.center
-        self.vel = vec(0,0)
-    
-    def update(self):
-        self.pos += self.vel * self.game.dt * 100
-        self.rect.center = self.pos
-        # print(self.rect.center)
-        # self.rect.center = pg.mouse.get_pos()
-
-    def draw(self, surf):
-        pass
-
-
 if __name__ == "__main__":
     # call on simulation, execute new and run to start main loop
     mayhem_clone = Main()

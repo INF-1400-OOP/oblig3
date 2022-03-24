@@ -84,4 +84,3 @@ while True:
             if key[pg.K_q]:
                 pg.quit()
                 exit()
-
