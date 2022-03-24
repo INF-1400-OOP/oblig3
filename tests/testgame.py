@@ -23,7 +23,7 @@ class Wall(pg.sprite.Sprite):
         self.rect.y = y * TILESIZE
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, group, x, y):
+    def __init__(self, group, x, y, n):
         super().__init__(group)
         self.image = pg.Surface((10, 20), pg.SRCALPHA)
         self.image.fill((255, 0, 0))
@@ -32,22 +32,33 @@ class Player(pg.sprite.Sprite):
         self.y = y
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
+        self.n = n
     
     def update(self):
         key = pg.key.get_pressed()
-        if key[pg.K_w]:
-            self.rect.y -= 5
-        if key[pg.K_s]:
-            self.rect.y += 5
-        if key[pg.K_a]:
-            self.rect.x -= 5
-        if key[pg.K_d]:
-            self.rect.x += 5
+        if self.n == 1:
+            if key[pg.K_w]:
+                self.rect.y -= 5
+            if key[pg.K_s]:
+                self.rect.y += 5
+            if key[pg.K_a]:
+                self.rect.x -= 5
+            if key[pg.K_d]:
+                self.rect.x += 5
+        else:
+            if key[pg.K_UP]:
+                self.rect.y -= 5
+            if key[pg.K_DOWN]:
+                self.rect.y += 5
+            if key[pg.K_LEFT]:
+                self.rect.x -= 5
+            if key[pg.K_RIGHT]:
+                self.rect.x += 5
 
 def update():
     walls.update()
     sprites.update()
-    camera.update(player)
+    camera.update(player1)
 
 def draw(screen):
     screen.fill((60, 60, 60))
@@ -58,7 +69,7 @@ def draw(screen):
     
     pg.display.flip()
 
-# bgimg = pg.image.load("iu.jpeg").convert_alpha()
+bgimg = pg.image.load("iu.jpeg").convert_alpha()
 
 sprites = pg.sprite.Group()
 walls = pg.sprite.Group()
@@ -67,7 +78,9 @@ for row, tiles in enumerate(map.map):
         if tile == "1":
             Wall([walls, sprites], col, row)
         if tile == "p":
-            player = Player(sprites, col, row)
+            player1 = Player(sprites, col, row, 1)
+        if tile == "q":
+            player2 = Player(sprites, col, row, 2)
 
 camera = Camera(map.width, map.height)
 while True:
