@@ -12,3 +12,5 @@
 - [ ] Overall directory structure - config and images in resources or similar
 - [ ] Either remove custom events or implement properly
 - [ ] ...
+
+1525 lines of code currently..
