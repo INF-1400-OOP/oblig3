@@ -16,6 +16,8 @@ class MayhemSprite(pg.sprite.Sprite):
             ):
         super().__init__(groups)
         self.image = pg.Surface((w,h), pg.SRCALPHA)
+        self.col = col
+        self.texture = texture
         if texture is None:
             self.image.fill(col)
         else:
@@ -35,35 +37,64 @@ class Player(MayhemSprite):
             y: int, 
             w: int, 
             h: int, 
-            col: tuple[int, int, int]
+            col: tuple[int, int, int],
+            textures: dict
             ):
-
-        super().__init__(groups, x, y, w, h, col=col)
+        self.textures = textures
+        self.current_texture = textures[0]
+        w, h = self.current_texture.get_rect().size
+        super().__init__(groups, x, y, w, h, texture=self.current_texture)
         self.game = game
         self.pos = vec(self.rect.center)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.controls = None
+        self.is_stationary = False
 
-    def update(self):
+    def update(self, walls):
+        if self.vel == vec(0,0):
+            self.is_stationary = True
+        else:
+            self.is_stationary = False
+
         self.acc = vec(0, 0)
-        self.keymove()
+        self._keymove()
 
-        # self.acc += vec(0, 10) * 10
-        # self.vel += self.acc * self.game.dt
-        # self.pos += self.vel * self.game.dt
+        if not self.is_stationary:
+            self.acc += vec(0, 100) * 2
+
+        self.vel += self.acc * self.game.dt
+        self.pos += self.vel * self.game.dt
         self.rect.center = self.pos
+        
+        self._impact(walls)
 
-    def keymove(self):
+
+    def _impact(self, walls):
+        collidewall = pg.sprite.spritecollide(self, walls, False)
+
+        for wall in collidewall:
+            if wall.texture == self.game.textures["l"]:
+                if self.vel != vec(0, 0):
+                    if self.vel.normalize()[1] > 0 and self.vel[1] > 200:
+                        self.kill()
+                self.vel = vec(0, 0)
+
+            else:
+                self.kill()
+
+    def _keymove(self):
         key = pg.key.get_pressed()
+
         if key[pg.K_w]:
-            self.pos[1] -= 5
+            self.acc[1] -= 1000
+            self.current_texture = self.textures[1 + (int(self.game.t) % (len(self.textures) - 1))]
         if key[pg.K_s]:
-            self.pos[1] += 5
+            self.acc[1] += 300
         if key[pg.K_a]:
-            self.pos[0] -= 5
+            self.acc[0] -= 300
         if key[pg.K_d]:
-            self.pos[0] += 5
+            self.acc[0] += 300
 
 class Wall(MayhemSprite):
     def __init__(self, 

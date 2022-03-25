@@ -26,19 +26,22 @@ class Main(Loop):
         # set center of screen
         self.center = vec(self.width // 2, self.height // 2)
 
-
-        # self.controls = EventHandler(KEY_HELD_DOWN)
-        # self.controls.handler = self.keypress
-        # self.dispatcher.register_handler(self.controls)
+        self.resethandler = EventHandler(pg.KEYDOWN)
+        self.resethandler.handler = self.reset
+        self.dispatcher.register_handler(self.resethandler)
 
     def load_data(self):
-        self.textures = self.prep_images(listdir(join(self.path, "textures")))
+        self.textures = self.prep_images(join(self.path, "textures"), listdir(join(self.path, "textures")))
         self.map = Map("testmap2.txt")
+        self.rocket_textures = self.prep_images(join(self.path, "spritesheets"), listdir(join(self.path, "spritesheets", "rocket")) + listdir(join(self.path, "spritesheets", "burn")), True)
 
-    def prep_images(self, imgnames:list[str]) -> dict:
+    def prep_images(self, path, imgnames:list[str], counter_key=False) -> dict:
         out_dict = {}
-        for imgname in imgnames:
-            out_dict[imgname.split(".")[0]] = pg.image.load(join(self.path, "textures", imgname))
+        for i, imgname in enumerate(imgnames):
+            if not counter_key:
+                out_dict[imgname.split(".")[0]] = pg.image.load(join(path, imgname)).convert_alpha()
+            else:
+                out_dict[i] = pg.image.load(join(path, imgname)).convert_alpha()
         return out_dict
 
     def new(self):
@@ -51,13 +54,13 @@ class Main(Loop):
                 if tile != "." and tile != "p":
                     Wall([self.all_walls, self.all_sprites], column, row, self.textures[tile])
                 elif tile == "p":
-                    self.player = Player(self, self.all_sprites, column, row, 10, 20, RED)
+                    self.player = Player(self, self.all_sprites, column, row, 10, 20, RED, self.rocket_textures)
 
         self.camera = Camera(self.map.width, self.map.height)
 
     def update(self):
         # update all groups
-        self.all_sprites.update()
+        self.all_sprites.update(self.all_walls)
         self.camera.update(self.player)
 
     def draw(self):
@@ -71,6 +74,12 @@ class Main(Loop):
             self.screen.blit(sprite.image, self.camera.apply(sprite))
 
         pg.display.flip()
+    
+    def reset(self, event):
+        super().keypress_handler(event)
+        key = pg.key.get_pressed()
+        if key[pg.K_r]:
+            self.new()
     
 if __name__ == "__main__":
     # call on simulation, execute new and run to start main loop
