@@ -1,5 +1,4 @@
 import pygame as pg
-from random import randint, uniform
 from os import listdir
 from os.path import join, dirname
 
@@ -33,9 +32,11 @@ class Main(Loop):
     def load_data(self):
         self.textures = self.prep_images(join(self.path, "textures"), listdir(join(self.path, "textures")))
         self.map = Map("testmap2.txt")
-        self.rocket_textures = self.prep_images(join(self.path, "spritesheets"), listdir(join(self.path, "spritesheets", "rocket")) + listdir(join(self.path, "spritesheets", "burn")), True)
-
-    def prep_images(self, path, imgnames:list[str], counter_key=False) -> dict:
+        self.rocket_textures = self.prep_images(join(self.path, "spritesheets", "rocket"), sorted(listdir(join(self.path, "spritesheets", "rocket"))), True)
+        self.smoke_img = pg.image.load(join(self.path, "imgs", "smoke", "smoke.png")).convert_alpha()
+    
+    @staticmethod
+    def prep_images(path, imgnames:list[str], counter_key=False) -> dict:
         out_dict = {}
         for i, imgname in enumerate(imgnames):
             if not counter_key:
@@ -52,9 +53,9 @@ class Main(Loop):
         for row, tiles in enumerate(self.map.map):
             for column, tile in enumerate(tiles):
                 if tile != "." and tile != "p":
-                    Wall([self.all_walls, self.all_sprites], column, row, self.textures[tile])
+                    Wall([self.all_walls, self.all_sprites], column, row, self.textures[tile], tile)
                 elif tile == "p":
-                    self.player = Player(self, self.all_sprites, column, row, 10, 20, RED, self.rocket_textures)
+                    self.player = Player(self, self.all_sprites, column, row, 10, 20, self.rocket_textures)
 
         self.camera = Camera(self.map.width, self.map.height)
 
