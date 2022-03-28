@@ -6,8 +6,10 @@ from game_base_module import *
 from config import *
 from camera import Camera
 from map import Map
-from sprites import Player, Wall
+from sprites import Wall
 from custom_events import *
+from player import Player
+from controller import Controller
 
 vec = pg.math.Vector2
 
@@ -30,11 +32,12 @@ class Main(Loop):
         self.dispatcher.register_handler(self.resethandler)
 
     def load_data(self):
+        self.map = Map("testmap1.txt")
         self.textures = self.prep_images(join(self.path, "textures"), listdir(join(self.path, "textures")))
-        self.map = Map("testmap2.txt")
         self.rocket_textures = self.prep_images(join(self.path, "spritesheets", "rocket"), sorted(listdir(join(self.path, "spritesheets", "rocket"))), True)
         self.smoke_img = pg.image.load(join(self.path, "imgs", "smoke", "smoke.png")).convert_alpha()
-    
+        self.laser_img = pg.image.load(join(self.path, "imgs", "laser", "laser_beam.png")).convert_alpha()
+
     @staticmethod
     def prep_images(path, imgnames:list[str], counter_key=False) -> dict:
         out_dict = {}
@@ -49,17 +52,20 @@ class Main(Loop):
         """ Called when game is initialized, can also be used for resetting the whole display. """
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
+        self.all_projectiles = pg.sprite.Group()
+
+        self.controller1 = Controller("wasd")
 
         for row, tiles in enumerate(self.map.map):
             for column, tile in enumerate(tiles):
                 if tile != "." and tile != "p":
                     Wall([self.all_walls, self.all_sprites], column, row, self.textures[tile], tile)
                 elif tile == "p":
-                    self.player = Player(self, self.all_sprites, column, row, 10, 20, self.rocket_textures)
+                    self.player = Player(self, self.all_sprites, self.controller1, column, row, 10, 20, self.rocket_textures)
 
         self.camera = Camera(self.map.width, self.map.height)
 
-    def update(self):
+    def update(self):   
         # update all groups
         self.all_sprites.update(self.all_walls)
         self.camera.update(self.player)

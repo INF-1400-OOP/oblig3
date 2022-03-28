@@ -9,5 +9,8 @@ WIDTH, HEIGHT = TILESIZE * 26, TILESIZE * 26
 
 NICE_COL = (255, 182, 193)
 
-# SPRITE SETTINGS
+# Sprite settings
 SPRITE_SPEED = 300
+
+# Projectile settings
+PROJECTILE_SPEED = 500
