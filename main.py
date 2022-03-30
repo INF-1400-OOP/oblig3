@@ -55,20 +55,23 @@ class Main(Loop):
         self.all_projectiles = pg.sprite.Group()
 
         self.controller1 = Controller("wasd")
+        self.controller2 = Controller("arrows")
 
         for row, tiles in enumerate(self.map.map):
             for column, tile in enumerate(tiles):
-                if tile != "." and tile != "p":
+                if tile != "." and tile != "1" and tile != "2":
                     Wall([self.all_walls, self.all_sprites], column, row, self.textures[tile], tile)
-                elif tile == "p":
-                    self.player = Player(self, self.all_sprites, self.controller1, column, row, 10, 20, self.rocket_textures)
+                elif tile == "1":
+                    self.player1 = Player(self, self.all_sprites, self.controller1, column, row, 10, 20, self.rocket_textures)
+                elif tile == "2":
+                    self.player2 = Player(self, self.all_sprites, self.controller2, column, row, 10, 20, self.rocket_textures)
 
         self.camera = Camera(self.map.width, self.map.height)
 
-    def update(self):   
+    def update(self):
         # update all groups
         self.all_sprites.update(self.all_walls)
-        self.camera.update(self.player)
+        self.camera.update(self.player1.pos // 2 + self.player2.pos // 2)
 
     def draw(self):
         # fill screen with background color
@@ -80,8 +83,6 @@ class Main(Loop):
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
 
-        pg.display.flip()
-    
     def reset(self, event):
         super().keypress_handler(event)
         key = pg.key.get_pressed()

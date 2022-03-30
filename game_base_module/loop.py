@@ -47,6 +47,7 @@ class Loop:
             self.event_handling()
             self.update()
             self.draw()
+            pg.display.flip()
             self.t += self.dt
 
     def update(self):

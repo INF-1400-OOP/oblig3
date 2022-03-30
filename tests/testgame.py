@@ -58,18 +58,15 @@ class Player(pg.sprite.Sprite):
 def update():
     walls.update()
     sprites.update()
-    camera.update(player1)
+    camera1.update(player1)
 
 def draw(screen):
     screen.fill((60, 60, 60))
-    # screen.blit(bgimg, (0,0))
 
     for sprite in sprites:
-        screen.blit(sprite.image, camera.apply(sprite))
+        screen.blit(sprite.image, camera1.apply(sprite))
     
     pg.display.flip()
-
-bgimg = pg.image.load("iu.jpeg").convert_alpha()
 
 sprites = pg.sprite.Group()
 walls = pg.sprite.Group()
@@ -82,7 +79,7 @@ for row, tiles in enumerate(map.map):
         if tile == "q":
             player2 = Player(sprites, col, row, 2)
 
-camera = Camera(map.width, map.height)
+camera1 = Camera(map.width, map.height)
 while True:
     dt = clock.tick(60) / 1000
     update()

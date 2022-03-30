@@ -15,10 +15,10 @@ class Controller:
 
         self.controls = self.controllers[in_use]
 
-        self.up = None
-        self.down = None
-        self.left = None
-        self.right = None
+        # self.up = None
+        # self.down = None
+        # self.left = None
+        # self.right = None
 
     def register_keystrokes(self):
         key = pg.key.get_pressed()
@@ -27,11 +27,11 @@ class Controller:
             if key[defined_key]:
                 self.controls[defined_key]()
 
-    def register_funcs(self, func_up, func_down, func_left, func_right):
-        self.up = func_up
-        self.down = func_down
-        self.left = func_left
-        self.right = func_right
+    def set_key_bindings(self, up, left, right, down):
+        self.up = up
+        self.left = left
+        self.right = right
+        self.down = down
     
     def _up(self):
         self.up()

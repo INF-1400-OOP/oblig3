@@ -6,8 +6,10 @@ class Camera:
 		self.camera = pg.Rect(0, 0, width, height)
 		self.width = width
 		self.height = height
+		self.scale = 1
 
 	def apply(self, entity):
+		pg.transform.scale(entity.image, (int(entity.rect.w * self.scale), int(entity.rect.h * self.scale)))
 		return entity.rect.move(self.camera.topleft)
 
 	def update(self, target):
@@ -18,5 +20,7 @@ class Camera:
 		y = min(0, y) # top
 		x = max(-(self.width - WIDTH), x) # right
 		y = max(-(self.height - HEIGHT), y) # bottom
+
+		self.scale = 1
 
 		self.camera = pg.Rect(x, y, self.width, self.height)

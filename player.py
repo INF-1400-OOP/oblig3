@@ -26,18 +26,16 @@ class Player(MayhemSprite):
         self.thrust = False
         self.smoke = []
         self.prev_shot = 0
+        self._configure_controls()
 
     def update(self, walls: pg.sprite.Group) -> None:
-        self._check_landed()
-        self.current_texture = self.textures[0]
+        self.thrust = False
         self.acc = vec(0, 0)
+        self.controller.register_keystrokes()
+        self._check_landed()
         img = self._select_texture()
 
-        self._keymove()
-
         self.image, _, self.mask = self.rotate_img(img, self.rot)
-
-        # If velocity is zero turn off gravity.
 
         self._apply_gravity()
 
@@ -46,11 +44,6 @@ class Player(MayhemSprite):
         self.rect.center = self.pos
         
         self._impact(walls)
-
-        if len(self.smoke) > 40:
-            last_particle = self.smoke.pop(0)
-            # last_particle = self.smoke[0]
-            last_particle.kill()
 
     def _apply_gravity(self):
         if not self.landed:
@@ -105,22 +98,37 @@ class Player(MayhemSprite):
             else:
                 self.kill()
 
-    def _keymove(self):
-        key = pg.key.get_pressed()
+    def up(self):
 
-        if key[pg.K_w]:
-            self.acc -= (vec(0, 1) * SPRITE_SPEED).rotate(-self.rot)
-            self.thrust = True
-            smoke_pos = self.pos + vec(0, self.rect.height).rotate(-self.rot)
-            self.smoke.append(SmokeParticle(self.game, smoke_pos, -self.vel*100))
-        else:
-            self.thrust = False
-        if key[pg.K_a]:
-            self.rot += 1
-        if key[pg.K_d]:
-            self.rot -= 1
-        if key[pg.K_SPACE]:
-            self._shoot()
+        # If up key is pressed, set thrust to true and increase the acceleration vector and apply rotation.
+
+        self.acc -= (vec(0, 1) * SPRITE_SPEED).rotate(-self.rot)
+        self.thrust = True
+
+        # Calculate the starting posistion of the smoke as the bottom of the sprite plus some margin, then rotated by the rotation of the sprite.
+
+        smoke_pos = self.pos + vec(0, self.rect.height * 0.75).rotate(-self.rot)
+
+        # Create a new smoke sprite and add it to the smoke list.
+
+        self.smoke.append(SmokeParticle(self.game, smoke_pos, vec(0,1).rotate(-self.rot)))
+    
+    def left(self):
+        self.rot += 1
+    
+    def right(self):
+        self.rot -= 1
+
+    def down(self):
+        self._shoot()
+
+    def _configure_controls(self):
+        self.controller.set_key_bindings(
+            up=self.up,
+            left=self.left,
+            right=self.right,
+            down=self.down
+        )
 
     def _shoot(self):
         if pg.time.get_ticks() / 1000 - self.prev_shot > 1:
