@@ -7,13 +7,12 @@ class SmokeParticle(pg.sprite.Sprite):
     def __init__(self, game, pos, vel):
         super().__init__(game.all_sprites)
         self.game = game
-        # self.alive = True
         self.d_scale_factor = 0.1
         self.image = self.scale(game.smoke_img, self.d_scale_factor)
         self.rect = self.image.get_rect(center=pos)
         self.alpha = 128
         self.d_alpha = 6
-        self.vel = vel * 200
+        self.vel = vel * 400
         self.pos = pos
         
     def update(self, *args):
