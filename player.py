@@ -1,4 +1,5 @@
 from sprites import *
+from smoke import SmokeParticle
 
 class Player(MayhemSprite):
     def __init__(
@@ -27,12 +28,15 @@ class Player(MayhemSprite):
         self.smoke = []
         self.prev_shot = 0
         self._configure_controls()
+        self.exploded = False
+        self.points = 0
 
     def update(self, walls: pg.sprite.Group) -> None:
         self.thrust = False
         self.acc = vec(0, 0)
         self.controller.register_keystrokes()
         self._check_landed()
+        self._hit_by_projectile()
         img = self._select_texture()
 
         self.image, _, self.mask = self.rotate_img(img, self.rot)
@@ -44,6 +48,7 @@ class Player(MayhemSprite):
         self.rect.center = self.pos
         
         self._impact(walls)
+        self._if_explode()
 
     def _apply_gravity(self):
         if not self.landed:
@@ -105,13 +110,7 @@ class Player(MayhemSprite):
         self.acc -= (vec(0, 1) * SPRITE_SPEED).rotate(-self.rot)
         self.thrust = True
 
-        # Calculate the starting posistion of the smoke as the bottom of the sprite plus some margin, then rotated by the rotation of the sprite.
-
-        smoke_pos = self.pos + vec(0, self.rect.height * 0.75).rotate(-self.rot)
-
-        # Create a new smoke sprite and add it to the smoke list.
-
-        self.smoke.append(SmokeParticle(self.game, smoke_pos, vec(0,1).rotate(-self.rot)))
+        self._exhaust()
     
     def left(self):
         self.rot += 1
@@ -130,10 +129,33 @@ class Player(MayhemSprite):
             down=self.down
         )
 
+    def _exhaust(self):
+        # Calculate the starting posistion of the smoke as the bottom of the sprite plus some margin, then rotated by the rotation of the sprite.
+
+        smoke_pos = self.pos + vec(0, self.rect.height * 0.75).rotate(-self.rot)
+
+        # Create a new smoke sprite and add it to the smoke list.
+
+        self.smoke.append(SmokeParticle(self.game, smoke_pos, vec(0,1).rotate(-self.rot)))
+
     def _shoot(self):
-        if pg.time.get_ticks() / 1000 - self.prev_shot > 1:
-            LaserBeam(self.game, self.pos - vec(0, self.rect.height / 2).rotate(-self.rot), -self.rot)
+        if pg.time.get_ticks() / 1000 - self.prev_shot > 0.2:
+            LaserBeam(self, self.game, self.pos - vec(0, self.rect.height / 2).rotate(-self.rot), -self.rot)
             self.prev_shot = pg.time.get_ticks() / 1000
+
+    def _if_explode(self):
+        if not self.alive() and not self.exploded:
+            Explotion(self.game, self.pos)
+
+    def _hit_by_projectile(self):
+        laser = pg.sprite.spritecollideany(self, self.game.all_projectiles)
+
+        if laser is None:
+            return
+
+        if laser.sender != self:
+                laser.sender.points += 1
+                self.kill()
 
     @staticmethod
     def rotate_img(img: pg.Surface, angle: float) -> tuple[pg.Surface, pg.Rect]:
