@@ -15,11 +15,6 @@ class Controller:
 
         self.controls = self.controllers[in_use]
 
-        # self.up = None
-        # self.down = None
-        # self.left = None
-        # self.right = None
-
     def register_keystrokes(self):
         key = pg.key.get_pressed()
 
