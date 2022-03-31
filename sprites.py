@@ -2,7 +2,6 @@ import pygame as pg
 import numpy as np
 from config import *
 from game_base_module.settings import *
-from smoke import SmokeParticle
 
 vec = pg.math.Vector2
 
@@ -17,10 +16,8 @@ class MayhemSprite(pg.sprite.Sprite):
             texture=None
             ):
         super().__init__(groups)
-        # self.image = pg.Surface((w,h), pg.SRCALPHA)
         self.image = texture
         self.texture = texture
-        # self.image.blit(texture, (0,0))
         self.mask = pg.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.x = x
@@ -41,11 +38,13 @@ class Wall(MayhemSprite):
 
 class LaserBeam(pg.sprite.Sprite):
     def __init__(self,
+            sender,
             game,
             pos: vec, 
             direction: int
             ):
         self.game = game
+        self.sender = sender
         super().__init__(game.all_sprites, game.all_projectiles)
         self.pos = pos
         self.dir = direction
@@ -88,3 +87,30 @@ class LaserBeam(pg.sprite.Sprite):
         new_rect = rot_img.get_rect(center=old_center)
         new_mask = pg.mask.from_surface(rot_img)
         return rot_img, new_rect, new_mask
+
+class Explotion(pg.sprite.Sprite):
+    def __init__(self, game, pos):
+        super().__init__(game.all_sprites)
+        self.images = game.explotion_img
+        self.image = self.images[0]
+        self.rect = self.image.get_rect(center=pos)
+        self.game = game
+
+        self.prev_frame_t = pg.time.get_ticks() / 1000
+        self.frame = 0
+
+    def update(self, *args):
+        self.frame += self._frame_step(len(self.images))
+
+        if self.frame == len(self.images) - 1:
+            self.kill()
+
+        self.image = self.images[self.frame]
+        self.rect = self.image.get_rect(center = self.rect.center)
+
+    def _frame_step(self, max):
+        if pg.time.get_ticks() / 1000 - self.prev_frame_t > 0.1:
+            self.prev_frame_t = pg.time.get_ticks() / 1000
+            return 1
+        else:
+            return 0
