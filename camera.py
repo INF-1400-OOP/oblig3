@@ -1,4 +1,3 @@
-from pkg_resources import yield_lines
 import pygame as pg
 from config import WIDTH, HEIGHT
 
@@ -11,9 +10,11 @@ class Camera:
 	def apply(self, rect):
 		return rect.move(self.camera.topleft)
 
-	def update(self, targets):
-		x = -sum([t.rect.centerx for t in targets]) // len(targets) + WIDTH // 2
-		y = -sum([t.rect.centery for t in targets]) // len(targets) + HEIGHT // 2
+	def update(self, target):
+		# x = -sum([t.rect.centerx for t in targets]) // len(targets) + WIDTH // 2
+		# y = -sum([t.rect.centery for t in targets]) // len(targets) + HEIGHT // 2
+		x = -target.rect.centerx + WIDTH // 2
+		y = -target.rect.centery + HEIGHT // 2
 
 		x = min(0, x)
 		y = min(0, y)
