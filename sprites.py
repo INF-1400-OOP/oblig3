@@ -65,7 +65,7 @@ class LaserBeam(pg.sprite.Sprite):
                 self.kill()
 
     @staticmethod
-    def rotate_img(img: pg.Surface, angle: float) -> tuple[pg.Surface, pg.Rect]:
+    def rotate_img(img, angle):
         """ Rotates image by given angle. 
         
         Args:
