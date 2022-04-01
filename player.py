@@ -8,9 +8,7 @@ class Player(MayhemSprite):
             groups: pg.sprite.Group,
             controls: object,
             x: int, 
-            y: int, 
-            w: int, 
-            h: int, 
+            y: int,
             textures: dict
             ):
         self.textures = textures
@@ -158,7 +156,7 @@ class Player(MayhemSprite):
                 self.kill()
 
     @staticmethod
-    def rotate_img(img: pg.Surface, angle: float) -> tuple[pg.Surface, pg.Rect]:
+    def rotate_img(img, angle):
         """ Rotates image by given angle. 
         
         Args:
