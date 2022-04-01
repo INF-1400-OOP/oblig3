@@ -1,4 +1,5 @@
 import pygame as pg
+import random
 from os import listdir
 from os.path import join, dirname
 
@@ -10,11 +11,13 @@ from sprites import Wall
 from custom_events import *
 from player import Player
 from controller import Controller
+from network import Network
+from server import Server
 
 vec = pg.math.Vector2
 
 class Main(Loop):
-    def __init__(self):
+    def __init__(self, port, addr, bitrate):
         # set path to main file
         self.path = dirname(__file__)
         
@@ -30,6 +33,8 @@ class Main(Loop):
         self.resethandler = EventHandler(pg.KEYDOWN)
         self.resethandler.handler = self.reset
         self.dispatcher.register_handler(self.resethandler)
+
+        self.network = Network(addr, port, bitrate)
 
     def load_data(self):
         self.map = Map("testmap1.txt")
@@ -59,6 +64,19 @@ class Main(Loop):
             return [pg.image.load(join(path_to_dir, im)).convert_alpha() for im in sorted(listdir(path_to_dir))]
         return [pg.image.load(join(path_to_dir, im)).convert_alpha() for im in listdir(path_to_dir)]
 
+    def spawn_player(self):
+        """ Spawns a player on a random landing pad tile one column position above. """
+        landing_pads = []
+        for row, tiles in enumerate(self.map.map):
+            for column, tile in enumerate(tiles):
+                if tile == "l":
+                    landing_pads.append((column - 1, row))
+
+        # randomize landing pad
+        pad = random.choice(landing_pads)
+
+        return Player(self, [self.all_players, self.all_sprites], Controller(), pad[0], pad[1], self.rocket_textures)
+
     def new(self):
         """ Called when game is initialized, can also be used for resetting the whole display. """
         self.all_sprites = pg.sprite.Group()
@@ -66,24 +84,21 @@ class Main(Loop):
         self.all_projectiles = pg.sprite.Group()
         self.all_players = pg.sprite.Group()
 
-        self.controller1 = Controller("wasd")
-        self.controller2 = Controller("arrows")
+        self.player = self.network.getP()
 
         for row, tiles in enumerate(self.map.map):
             for column, tile in enumerate(tiles):
                 if tile != "." and tile != "1" and tile != "2":
                     Wall([self.all_walls, self.all_sprites], column, row, self.textures[tile], tile)
-                elif tile == "1":
-                    self.player1 = Player(self, [self.all_sprites, self.all_players], self.controller1, column, row, 10, 20, self.rocket_textures)
-                elif tile == "2":
-                    self.player2 = Player(self, [self.all_sprites, self.all_players], self.controller2, column, row, 10, 20, self.rocket_textures)
 
         self.camera = Camera(self.map.width, self.map.height)
 
     def update(self):
         # update all groups
+        self.opponent = self.network.send(self.player)
+
         self.all_sprites.update(self.all_walls)
-        self.camera.update(self.all_players)
+        self.camera.update(self.player)
 
     def draw(self):
         # fill screen with background color
