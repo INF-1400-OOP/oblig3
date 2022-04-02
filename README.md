@@ -9,9 +9,12 @@
 - [ ] Actual well-ish designed map
 - [x] More textures? - piskelApp
 - [ ] 2 player
-- [ ] Overall directory structure - config and images in resources or similar
+- [x] Overall directory structure - config and images in resources or similar
 - [ ] Either remove custom events or implement properly
-- [ ] Laser beams
-- [ ] ...
-
-1525 lines of code currently..
+- [x] Laser beams
+- [x] Server
+- [x] Network class
+- [ ] Working multi-client game for 2p
+- [ ] Refueling
+- [ ] Background art
+- [ ] Moving background (?)
