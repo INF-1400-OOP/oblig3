@@ -24,6 +24,12 @@ class Main(Loop):
         # super Loop object
         super().__init__(WIDTH, HEIGHT, FPS)
 
+        # self.screen1 = self.screen.subsurface(0,0, self.screen.get_width() // 2, self.screen.get_height())
+        # self.screen2 = self.screen.subsurface(self.screen.get_width() // 2, 0, self.screen.get_width() // 2, self.screen.get_height())
+        self.screen1 = pg.Surface((self.screen.get_width() // 2, self.screen.get_height()))
+        self.screen2 = pg.Surface((self.screen.get_width() // 2, self.screen.get_height()))
+
+
         # set center of screen
         self.center = vec(self.width // 2, self.height // 2)
 
@@ -78,22 +84,32 @@ class Main(Loop):
                 elif tile == "2":
                     self.player2 = Player(self, [self.all_sprites, self.all_players], self.controller2, column, row, 10, 20, self.rocket_textures)
 
-        self.camera = Camera(self.map.width, self.map.height)
+        self.camera1 = Camera(self.map.width, self.map.height)
+        self.camera2 = Camera(self.map.width, self.map.height)
 
     def update(self):
         # update all groups
         self.all_sprites.update(self.all_walls)
-        self.camera.update(self.all_players)
+        self.camera1.update(self.player1)
+        self.camera2.update(self.player2)
 
     def draw(self):
         # fill screen with background color
-        self.screen.fill(BACKGROUND_COLOR)
+        # self.screen.fill(BLACK)
+        self.screen1.fill(BACKGROUND_COLOR)
+        self.screen2.fill(BACKGROUND_COLOR)
 
         # Display FPS in caption
         pg.display.set_caption(f"{self.clock.get_fps():.2f}")
         
         for sprite in self.all_sprites:
-            self.screen.blit(sprite.image, self.camera.apply(sprite.rect))
+            self.screen1.blit(sprite.image, self.camera1.apply(sprite.rect))
+            self.screen2.blit(sprite.image, self.camera2.apply(sprite.rect))
+
+        self.screen.blit(self.screen1, (0,0))
+        self.screen.blit(self.screen2, (self.screen.get_width()//2,0))
+
+        pg.draw.line(self.screen, BLACK, (self.screen.get_width() // 2, 0), (self.screen.get_width()//2,self.screen.get_height()), 5)
 
     def reset(self, event):
         super().keypress_handler(event)
