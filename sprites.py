@@ -31,7 +31,7 @@ class Wall(MayhemSprite):
             x: int, 
             y: int, 
             texture: str,
-            texture_id: str
+            texture_id: str,
             ):
         super().__init__(group, x, y, TILESIZE, TILESIZE, texture=texture)
         self.texture_id = texture_id

@@ -1,4 +1,5 @@
 import pygame as pg
+import numpy as np
 from os import listdir
 from os.path import join, dirname
 
@@ -10,6 +11,7 @@ from sprites import Wall
 from custom_events import *
 from player import Player
 from controller import Controller
+from minimap import Minimap
 
 vec = pg.math.Vector2
 
@@ -41,6 +43,7 @@ class Main(Loop):
         self.smoke_img = pg.image.load(join(self.texturedir, "smoke", "smoke.png")).convert_alpha()
         self.laser_img = pg.image.load(join(self.texturedir, "laser", "laser_beam.png")).convert_alpha()
         self.explotion_img = self.load_img_to_list(join(self.texturedir, "explotion"), sort=True)
+        self.background = pg.image.load(join(self.texturedir, "background", "test_background.png")).convert_alpha()
 
     @staticmethod
     def load_img_to_dict(path_to_dir, counter_key=False, sort=False) -> dict:
@@ -68,6 +71,9 @@ class Main(Loop):
         self.all_walls = pg.sprite.Group()
         self.all_projectiles = pg.sprite.Group()
         self.all_players = pg.sprite.Group()
+        self.minimaps = pg.sprite.Group()
+
+        self.minimap = Minimap(self, self.screen, self.map.map)
 
         self.controller1 = Controller("wasd")
         self.controller2 = Controller("arrows")
@@ -89,6 +95,7 @@ class Main(Loop):
         self.all_sprites.update(self.all_walls)
         self.camera1.update(self.player1)
         self.camera2.update(self.player2)
+        self.minimaps.update()
 
     def draw(self):
         # fill screen with background color
@@ -107,6 +114,7 @@ class Main(Loop):
         self.screen.blit(self.screen2, (self.screen.get_width()//2,0))
 
         pg.draw.line(self.screen, BLACK, (self.width // 2, 0), (self.width //2,self.height), 5)
+        self.minimaps.draw(self.screen)
 
     def reset(self, event):
         super().keypress_handler(event)
