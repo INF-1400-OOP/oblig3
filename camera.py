@@ -13,7 +13,7 @@ class Camera:
 
 	def update(self, target):
 		x = -target.rect.x + WIDTH // 4
-		y = -target.rect.y + HEIGHT // 4
+		y = -target.rect.y + HEIGHT // 2
 
 		x = min(0, x)
 		y = min(0, y)

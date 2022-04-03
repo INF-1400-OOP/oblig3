@@ -24,11 +24,8 @@ class Main(Loop):
         # super Loop object
         super().__init__(WIDTH, HEIGHT, FPS)
 
-        # self.screen1 = self.screen.subsurface(0,0, self.screen.get_width() // 2, self.screen.get_height())
-        # self.screen2 = self.screen.subsurface(self.screen.get_width() // 2, 0, self.screen.get_width() // 2, self.screen.get_height())
-        self.screen1 = pg.Surface((self.screen.get_width() // 2, self.screen.get_height()))
-        self.screen2 = pg.Surface((self.screen.get_width() // 2, self.screen.get_height()))
-
+        self.screen1 = pg.Surface((self.width // 2, self.height))
+        self.screen2 = pg.Surface((self.width // 2, self.height))
 
         # set center of screen
         self.center = vec(self.width // 2, self.height // 2)
@@ -109,7 +106,7 @@ class Main(Loop):
         self.screen.blit(self.screen1, (0,0))
         self.screen.blit(self.screen2, (self.screen.get_width()//2,0))
 
-        pg.draw.line(self.screen, BLACK, (self.screen.get_width() // 2, 0), (self.screen.get_width()//2,self.screen.get_height()), 5)
+        pg.draw.line(self.screen, BLACK, (self.width // 2, 0), (self.width //2,self.height), 5)
 
     def reset(self, event):
         super().keypress_handler(event)
