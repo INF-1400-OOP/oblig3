@@ -6,12 +6,11 @@ from os.path import join, dirname
 from game_base_module import *
 from config import *
 from camera import Camera
-from map import Map
+from map import Map, Screen
 from sprites import Wall
-from custom_events import *
 from player import Player
 from controller import Controller
-from minimap import Minimap
+from scoreboard import Scoreboard
 
 vec = pg.math.Vector2
 
@@ -19,15 +18,15 @@ class Main(Loop):
     def __init__(self):
         # set path to main file
         self.path = dirname(__file__)
-        
+
         # set path to directory containing textures.
         self.texturedir = join(self.path, "textures")
 
         # super Loop object
         super().__init__(WIDTH, HEIGHT, FPS)
 
-        self.screen1 = pg.Surface((self.width // 2, self.height))
-        self.screen2 = pg.Surface((self.width // 2, self.height))
+        self.screen1 = Screen(0, 0, self.width // 2, self.height)
+        self.screen2 = Screen(self.width // 2, 0, self.width // 2, self.height)
 
         # set center of screen
         self.center = vec(self.width // 2, self.height // 2)
@@ -71,57 +70,73 @@ class Main(Loop):
         self.all_walls = pg.sprite.Group()
         self.all_projectiles = pg.sprite.Group()
         self.all_players = pg.sprite.Group()
-        self.minimaps = pg.sprite.Group()
-
-        self.minimap = Minimap(self, self.screen, self.map.map)
+        self.all_statuses = pg.sprite.Group()
 
         self.controller1 = Controller("wasd")
         self.controller2 = Controller("arrows")
+
+        self.scoreboard = Scoreboard()
 
         for row, tiles in enumerate(self.map.map):
             for column, tile in enumerate(tiles):
                 if tile != "." and tile != "1" and tile != "2":
                     Wall([self.all_walls, self.all_sprites], column, row, self.textures[tile], tile)
                 elif tile == "1":
-                    self.player1 = Player(self, [self.all_sprites, self.all_players], self.controller1, column, row, 10, 20, self.rocket_textures)
+                    self.player1 = Player(self, self.controller1, column, row, self.rocket_textures, 1, self.screen1)
                 elif tile == "2":
-                    self.player2 = Player(self, [self.all_sprites, self.all_players], self.controller2, column, row, 10, 20, self.rocket_textures)
+                    self.player2 = Player(self, self.controller2, column, row, self.rocket_textures, 2, self.screen2)
 
         self.camera1 = Camera(self.map.width, self.map.height)
         self.camera2 = Camera(self.map.width, self.map.height)
 
+
     def update(self):
         # update all groups
         self.all_sprites.update(self.all_walls)
+        self.all_statuses.update()
         self.camera1.update(self.player1)
         self.camera2.update(self.player2)
-        self.minimaps.update()
 
     def draw(self):
         # fill screen with background color
-        # self.screen.fill(BLACK)
-        self.screen1.fill(BACKGROUND_COLOR)
-        self.screen2.fill(BACKGROUND_COLOR)
+        self.screen1.surf.fill(BACKGROUND_COLOR)
+        self.screen2.surf.fill(BACKGROUND_COLOR)
 
         # Display FPS in caption
         pg.display.set_caption(f"{self.clock.get_fps():.2f}")
         
         for sprite in self.all_sprites:
-            self.screen1.blit(sprite.image, self.camera1.apply(sprite.rect))
-            self.screen2.blit(sprite.image, self.camera2.apply(sprite.rect))
+            self.screen1.surf.blit(sprite.image, self.camera1.apply(sprite.rect))
+            self.screen2.surf.blit(sprite.image, self.camera2.apply(sprite.rect))
 
-        self.screen.blit(self.screen1, (0,0))
-        self.screen.blit(self.screen2, (self.screen.get_width()//2,0))
+        self.screen.blit(self.screen1.surf, self.screen1.rect)
+        self.screen.blit(self.screen2.surf, self.screen2.rect)
 
         pg.draw.line(self.screen, BLACK, (self.width // 2, 0), (self.width //2,self.height), 5)
-        self.minimaps.draw(self.screen)
+
+        self.all_statuses.draw(self.screen)
 
     def reset(self, event):
         super().keypress_handler(event)
         key = pg.key.get_pressed()
         if key[pg.K_r]:
             self.new()
-    
+
+    def respawn(self, player_n, lp_rect):
+        if player_n == 1:
+            self.player1 = Player(self, self.controller1, 0,0, self.rocket_textures, 1, self.screen1)
+            self.player1.rect.midbottom = lp_rect.midtop
+            self.player1.pos = vec(self.player1.rect.center)
+            self.scoreboard.give_point("2")
+        elif player_n == 2:
+            self.player2 = Player(self, self.controller2, 0,0, self.rocket_textures, 2, self.screen2)
+            self.player2.rect.midbottom = lp_rect.midtop
+            self.player2.pos = vec(self.player2.rect.center)
+            self.scoreboard.give_point("1")
+
+        print(self.scoreboard)
+
+
 if __name__ == "__main__":
     # call on simulation, execute new and run to start main loop
     mayhem_clone = Main()

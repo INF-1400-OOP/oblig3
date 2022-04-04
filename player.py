@@ -1,23 +1,24 @@
 from sprites import *
-from smoke import SmokeParticle
+from effects import SmokeParticle, Explotion, LaserBeam
 
 class Player(MayhemSprite):
     def __init__(
             self, 
             game: object,
-            groups: pg.sprite.Group,
             controls: object,
             x: int, 
             y: int, 
-            w: int, 
-            h: int, 
-            textures: dict
+            textures: dict,
+            player_n: int,
+            screen: pg.Surface
             ):
         self.textures = textures
         self.current_texture = textures[0]
         w, h = self.current_texture.get_rect().size
-        super().__init__(groups, x, y, w, h, texture=self.current_texture)
+        super().__init__([game.all_sprites, game.all_players], x, y, w, h, texture=self.current_texture)
         self.game = game
+        self.screen = screen
+        self.fuel = FuelTank(self)
         self.controller = controls
         self.pos = vec(self.rect.center)
         self.vel = vec(0, 0)
@@ -29,7 +30,7 @@ class Player(MayhemSprite):
         self.prev_shot = 0
         self._configure_controls()
         self.exploded = False
-        self.points = 0
+        self.player_n = player_n
 
     def update(self, walls: pg.sprite.Group) -> None:
         self.thrust = False
@@ -49,6 +50,7 @@ class Player(MayhemSprite):
         
         self._impact(walls)
         self._if_explode()
+        self._refuel()
 
     def _apply_gravity(self):
         if not self.landed:
@@ -105,12 +107,18 @@ class Player(MayhemSprite):
 
     def up(self):
 
+        # Check if there is fuel left, if not, then do not execute the code below.
+        if self.fuel.amount == 0:
+            return
+
         # If up key is pressed, set thrust to true and increase the acceleration vector and apply rotation.
 
         self.acc -= (vec(0, 1) * SPRITE_SPEED).rotate(-self.rot)
         self.thrust = True
 
         self._exhaust()
+
+        self._use_fuel()
     
     def left(self):
         self.rot += 1
@@ -154,8 +162,33 @@ class Player(MayhemSprite):
             return
 
         if laser.sender != self:
-                laser.sender.points += 1
                 self.kill()
+
+    def _get_reset_point(self):
+        opponent = None
+        for player in self.game.all_players:
+            if player != self:
+                opponent = player
+        furthest_lp = None
+        dist = 0
+        for wall in self.game.all_walls:
+            if wall.texture_id == "l":
+                calc_dist = vec(wall.rect.center).distance_to(vec(opponent.rect.center))
+                if calc_dist > dist:
+                    furthest_lp = wall
+                    dist = calc_dist
+        return furthest_lp.rect
+
+    def kill(self):
+        super().kill()
+        self.game.respawn(self.player_n, self._get_reset_point())
+
+    def _use_fuel(self):
+        self.fuel.amount -= 1
+
+    def _refuel(self):
+        if self.landed:
+            self.fuel.amount += 2
 
     @staticmethod
     def rotate_img(img: pg.Surface, angle: float) -> tuple[pg.Surface, pg.Rect]:

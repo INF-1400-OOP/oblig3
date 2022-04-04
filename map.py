@@ -16,3 +16,8 @@ class Map:
             for row in f:
                objects.append(row.strip())
         return objects
+
+class Screen:
+    def __init__(self, x, y, w, h):
+        self.surf = pg.Surface((w, h), pg.SRCALPHA)
+        self.rect = self.surf.get_rect(topleft=(x,y))
