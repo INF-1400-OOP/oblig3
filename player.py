@@ -187,7 +187,7 @@ class Player(MayhemSprite):
         self.fuel.amount -= 1
 
     def _refuel(self):
-        if self.landed:
+        if self.landed and self.fuel.amount <= self.fuel.max_amount:
             self.fuel.amount += 2
 
     @staticmethod

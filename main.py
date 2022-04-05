@@ -7,10 +7,9 @@ from game_base_module import *
 from config import *
 from camera import Camera
 from map import Map, Screen
-from sprites import Wall
+from sprites import Wall, Scoreboard
 from player import Player
 from controller import Controller
-from scoreboard import Scoreboard
 
 vec = pg.math.Vector2
 
@@ -36,7 +35,7 @@ class Main(Loop):
         self.dispatcher.register_handler(self.resethandler)
 
     def load_data(self):
-        self.map = Map("testmap1.txt")
+        self.map = Map("testmap2.txt")
         self.textures = self.load_img_to_dict(join(self.texturedir, "blocks"))
         self.rocket_textures = self.load_img_to_dict(join(self.texturedir, "rocket"), True, True)
         self.smoke_img = pg.image.load(join(self.texturedir, "smoke", "smoke.png")).convert_alpha()
@@ -75,7 +74,7 @@ class Main(Loop):
         self.controller1 = Controller("wasd")
         self.controller2 = Controller("arrows")
 
-        self.scoreboard = Scoreboard()
+        self.scoreboard = Scoreboard(self)
 
         for row, tiles in enumerate(self.map.map):
             for column, tile in enumerate(tiles):
@@ -134,7 +133,7 @@ class Main(Loop):
             self.player2.pos = vec(self.player2.rect.center)
             self.scoreboard.give_point("1")
 
-        print(self.scoreboard)
+        # print(self.scoreboard)
 
 
 if __name__ == "__main__":
