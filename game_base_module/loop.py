@@ -5,7 +5,57 @@ from .event_handler import EventDispatcher, EventHandler, DuplicateHandlerError
 pg.init()
 
 class Loop:
+    """ Base object for simple creation of game loops.
+    
+    Attributes
+    ----------
+    width, height : int, int
+        Measurements of main display
+    fps : int
+        Target Frames Per Second of loop.
+    screen : pg.Surface
+        Main screen.
+    clock : pygame.time.Clock
+        Clock for synchronizing all in-game events and sprite movement.
+    all_interactives : list
+        List to keep track of interactives, like buttons, sliders and such if any.
+    t : float
+        Time since main loop start. (Default 0)
+    dispatcher : EventDispatcher
+        Dispatches events to EventHandler's when events occur.
+    quit_handler : EventHandler
+        Handles quitting.
+
+    Methods
+    -------
+    load_data()
+        Loads data when instanced.
+    new()
+        Starts a new game by instantiating all objects again.
+    run()
+        Continouously runs and checks for events and updates sprites and game logic as well as drawing sprites and background.
+    update()
+        Update all groups.
+    draw()
+        Draw all groups.
+    quit()
+        Quit game.
+    event_handling()
+        Handle events using EventDispatcher.
+    keypress_handler(event)
+        Handles keypresses and is attached to an EventHandler.
+    """
     def __init__(self, width, height, fps):
+        """
+        Args
+        ----
+        width : int
+            Screen width.
+        height : int
+            Screen height.
+        fps : int
+            Target fps.
+        """
         self.width, self.height = width, height
         self.fps = fps
         
@@ -51,18 +101,22 @@ class Loop:
             self.t += self.dt
 
     def update(self):
-        """ Update once every frame """
+        """ Update once every frame. """
         pass
 
     def draw(self):
-        """ Draws once every frame """
+        """ Draws once every frame. """
         pass
 
     def quit(self):
+        """ Quit game. """
+
         pg.quit()
         exit()
 
     def event_handling(self):
+        """ Handle events using EventDispatcher. """
+
         for i, event in enumerate(pg.event.get()):
             # quit if exit button pressed
             if event.type == pg.QUIT:
@@ -72,6 +126,8 @@ class Loop:
                 # print(i, event)
     
     def keypress_handler(self, event):
+        """ Handles keypresses and is attached to an EventHandler. """
+
         key_input = pg.key.get_pressed()
         if key_input[pg.K_ESCAPE]:
             self.quit()
