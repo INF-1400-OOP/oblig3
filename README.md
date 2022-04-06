@@ -8,10 +8,11 @@
 - [x] Implement rotation on player
 - [ ] Actual well-ish designed map
 - [x] More textures? - piskelApp
-- [ ] 2 player
-- [ ] Overall directory structure - config and images in resources or similar
-- [ ] Either remove custom events or implement properly
-- [ ] Laser beams
-- [ ] ...
+- [x] 2 player
+- [x] Overall directory structure - config and images in resources or similar
+- [x] Either remove custom events or implement properly
+- [x] Laser beams
+- [ ] Fix scoreboard
 
-1525 lines of code currently..
+2593 lines of code currently..
+
