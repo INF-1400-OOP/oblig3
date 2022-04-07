@@ -44,7 +44,7 @@ class Player(MayhemSprite):
         method for what happens when a left key is pressed.
     right()
         method for what happens when a right key is pressed.
-    kill()
+    kill(reason)
         method that when called removes sprite from any groups. Also this method has been extended to command game object to respawn a new player object.
     rotate_img(img, angle)
         Rotates image by given angle.
@@ -210,7 +210,7 @@ class Player(MayhemSprite):
                 # if speed in y direction is larger than 500 we kill the sprite.
 
                 if self.vel[1] > 200:
-                    self.kill()
+                    self.kill(reson="wall")
 
                 # Set velocity to the zero vector to "turn off" the gravity.
 
@@ -218,7 +218,7 @@ class Player(MayhemSprite):
                 self.rot = 0
                 self.landed = True
             else:
-                self.kill()
+                self.kill(reason="wall")
 
     def up(self) -> None:
         """ Method for moving up. This method does a couple of important things:
@@ -309,7 +309,7 @@ class Player(MayhemSprite):
         # Each laser object has a sender attribute to check that we dont register collisions between laser and player when player shoots and rectangles probably overlap in some rotations.
         
         if laser.sender != self:
-                self.kill()
+                self.kill(reason="shot")
 
     def _get_reset_point(self) -> pg.Rect:
         """ Method for finding a respawn point - the landing pad the furthest away from the opponent.
@@ -351,10 +351,17 @@ class Player(MayhemSprite):
 
         return furthest_lp.rect
 
-    def kill(self) -> None:
-        """ Modify the standard kill method of sprites to also run a code block in game which respawns a new player. """
+    def kill(self, reason: str) -> None:
+        """ Modify the standard kill method of sprites to also run a code block in game which respawns a new player. 
+        
+        Args
+        ----
+        reason : str
+            Why was the player killed, either 'shot' or 'wall'.
+        """
+      
         super().kill()
-        self.game.respawn(self.player_n, self._get_reset_point())
+        self.game.respawn(self.player_n, self._get_reset_point(), reason)
 
     def _use_fuel(self) -> None:
         """ When thrusting we subtract one fuel entity. """

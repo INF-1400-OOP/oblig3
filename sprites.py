@@ -180,6 +180,8 @@ class Scoreboard(pg.sprite.Sprite):
         A Getter of scores.
     give_point(player_n)
         Give a point to player number player_n
+    take_point(player_n)
+        Take a point from player_n unless player has zero points.
     reset_score()
         Set all scores to zero.
     __str__()
@@ -197,43 +199,63 @@ class Scoreboard(pg.sprite.Sprite):
         self.rect = self.image.get_rect(midtop=game.center + vec(0, -game.height // 2))
         self._scores = {"1": 0, "2": 0}
         self._prev_scores = self._scores
-        self.game = game
 
-    def update(self):
+    def update(self) -> None:
         """ Update what to be shown in the scores. """
 
-        #self.image.fill(WHITE)
-
-        # # if there has not been any changes to the scores quit function early
-        # if self._prev_scores == self._scores:
-        #     return
-        # draw_text(self.game.screen, f"Player 1 : {self._scores['1']}", 28, self.rect.x, self.rect.y+20, BLACK, center=False)
-        pass
-
-    def draw(self, surf):
-        """ Draw image to surf which is main screen. """
-
-        # surf.blit(self.image, self.rect.center)
-        pass
+        self.image.fill((50, 50, 50))
+        draw_text(self.image, "SCORES", 32, self.rect.w // 2, self.rect.h // 5, WHITE, True)
+        draw_text(self.image, f"P1 : {self._scores['1']}", 30, self.rect.w // 2, 3 * self.rect.h // 5, WHITE, True)
+        draw_text(self.image, f"P2 : {self._scores['2']}", 30, self.rect.w // 2, 4 * self.rect.h // 5, WHITE, True)
 
     @property
-    def scores(self):
-        """ A Getter of scores. """
+    def scores(self) -> dict:
+        """ A Getter of scores. 
+
+        Returns
+        -------
+        out : dict
+            Scores.
+        """
 
         return self._scores
 
-    def give_point(self, player_n):
-        """ Give a point to player number player_n """
+    def give_point(self, player_n : str) -> None:
+        """ Give a point to player number player_n.
+
+        Args
+        ----
+        player_n: int
+            Either 1 or 2 indicating player 1 or 2.
+        """
 
         self._scores[player_n] += 1
 
-    def reset_score(self):
+    def take_point(self, player_n : str) -> None:
+        """ Remove a point from player number player_n.
+        
+        Args
+        ----
+        player_n: int
+            Either 1 or 2 indicating player 1 or 2.
+        """
+        if self._scores[player_n] <= 0:
+            return
+        self._scores[player_n] -= 1
+
+    def reset_score(self) -> None:
         """ Set all scores to zero. """
 
         self._scores["1"] = 0
         self._scores["2"] = 0
 
-    def __str__(self):
-        """ Prettier printing. """
+    def __str__(self) -> str:
+        """ Prettier printing. 
+        
+        Returns
+        -------
+        out : str
+            Representation of scores.
+        """
 
         return f"p1: {self._scores['1']}\np2: {self._scores['2']}"

@@ -76,7 +76,7 @@ class Main(Loop):
         Handles keypresses and is attached to an EventHandler.
     reset(event)
         Handles a reset by calling new() on keypress 'r'. Attached to an EventHandler.
-    respawn(player_n, lp_rect)
+    respawn(player_n, lp_rect, reason)
         Respawns player with player number player_n at the top of landing pad rect lp_rect.
     """
     def __init__(self):
@@ -198,6 +198,7 @@ class Main(Loop):
         # Draw statuses the regular way as these are not wanted to be in the "frame" but
         # rather static "on top" of the screen.
         self.all_statuses.draw(self.screen)
+        # draw_text(self.screen, "ttestestset", 28, 100, 10, WHITE, True)
 
     def reset(self, event):
         """ Handles a reset by calling new() on keypress 'r'. Attached to an EventHandler. """
@@ -207,21 +208,37 @@ class Main(Loop):
         if key[pg.K_r]:
             self.new()
 
-    def respawn(self, player_n, lp_rect):
-        """ Respawns player with player number player_n at the top of landing pad rect lp_rect. """
+    def respawn(self, player_n, lp_rect, reason):
+        """ Respawns player with player number player_n at the top of landing pad rect lp_rect. 
+        
+        Args
+        ----
+        player_n : int
+            Either 1 or 2 representing player that is to respawn.
+        lp_rect : pygame.Rect
+            Rectangle of landing pad.
+        reason : str
+            Why was the player killed, used to decide wheter to give or take point.
+        """
 
         if player_n == 1:
             self.player1 = Player(self, self.controller1, 0,0, self.rocket_textures, 1, self.screen1)
             self.player1.rect.midbottom = lp_rect.midtop
             self.player1.pos = vec(self.player1.rect.center)
-            self.scoreboard.give_point("2")
+
+            if reason == "shot":
+                self.scoreboard.give_point("2")
+            if reason == "wall":
+                self.scoreboard.take_point("1")
         elif player_n == 2:
             self.player2 = Player(self, self.controller2, 0,0, self.rocket_textures, 2, self.screen2)
             self.player2.rect.midbottom = lp_rect.midtop
             self.player2.pos = vec(self.player2.rect.center)
-            self.scoreboard.give_point("1")
 
-        print(self.scoreboard)
+            if reason == "shot":
+                self.scoreboard.give_point("1")
+            if reason == "wall":
+                self.scoreboard.take_point("2")
 
 if __name__ == "__main__":
 
