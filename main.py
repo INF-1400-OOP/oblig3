@@ -1,8 +1,6 @@
 """ Main loop object of this game source.
 
 Usage: run this module directly.
-
-TODO: Fix scoreboard.
 """
 
 import pygame as pg
