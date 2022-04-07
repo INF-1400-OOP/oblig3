@@ -210,7 +210,7 @@ class Player(MayhemSprite):
                 # if speed in y direction is larger than 500 we kill the sprite.
 
                 if self.vel[1] > 200:
-                    self.kill(reson="wall")
+                    self.kill(reason="wall")
 
                 # Set velocity to the zero vector to "turn off" the gravity.
 
@@ -236,7 +236,7 @@ class Player(MayhemSprite):
 
         # If up key is pressed, set thrust to true and increase the acceleration vector and apply rotation.
 
-        self.acc -= (vec(0, 1) * SPRITE_SPEED).rotate(-self.rot)
+        self.acc -= (vec(0, 1) * SPRITE_FORCE).rotate(-self.rot)
         self.thrust = True
 
         self._exhaust()
@@ -244,10 +244,10 @@ class Player(MayhemSprite):
         self._use_fuel()
     
     def left(self) -> None:
-        self.rot += 1
+        self.rot += 2
     
     def right(self) -> None:
-        self.rot -= 1
+        self.rot -= 2
 
     def down(self) -> None:
         self._shoot()
