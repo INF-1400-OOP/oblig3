@@ -202,17 +202,19 @@ class Scoreboard(pg.sprite.Sprite):
     def update(self):
         """ Update what to be shown in the scores. """
 
-        self.image.fill(WHITE)
+        #self.image.fill(WHITE)
 
         # # if there has not been any changes to the scores quit function early
         # if self._prev_scores == self._scores:
         #     return
-        draw_text(self.game.screen, f"Player 1 : {self._scores['1']}", 28, self.rect.x, self.rect.y+20, BLACK, center=False)
+        # draw_text(self.game.screen, f"Player 1 : {self._scores['1']}", 28, self.rect.x, self.rect.y+20, BLACK, center=False)
+        pass
 
     def draw(self, surf):
         """ Draw image to surf which is main screen. """
 
-        surf.blit(self.image, self.rect.center)
+        # surf.blit(self.image, self.rect.center)
+        pass
 
     @property
     def scores(self):

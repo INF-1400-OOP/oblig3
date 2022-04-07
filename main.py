@@ -1,6 +1,8 @@
 """ Main loop object of this game source.
 
 Usage: run this module directly.
+
+TODO: Fix scoreboard.
 """
 
 import pygame as pg
@@ -100,7 +102,7 @@ class Main(Loop):
     def load_data(self):
         """ Method for loading textures and maps and storing them in variables. """
 
-        self.map = Map("testmap2.txt")
+        self.map = Map("testmap1.txt")
         self.textures = self.load_img_to_dict(join(self.texturedir, "blocks"))
         self.rocket_textures = self.load_img_to_dict(join(self.texturedir, "rocket"), True, True)
         self.smoke_img = pg.image.load(join(self.texturedir, "smoke", "smoke.png")).convert_alpha()
@@ -218,6 +220,8 @@ class Main(Loop):
             self.player2.rect.midbottom = lp_rect.midtop
             self.player2.pos = vec(self.player2.rect.center)
             self.scoreboard.give_point("1")
+
+        print(self.scoreboard)
 
 if __name__ == "__main__":
 

@@ -5,7 +5,6 @@ vec = pg.math.Vector2
 
 from game_base_module import randvec, GREEN
 from config import *
-from player import Player
 
 class SmokeParticle(pg.sprite.Sprite):
     """ SmokeParticle class which inherits from pygame.sprite.Sprite. When multiple SmokeParticles are created in succession it appears as a cloud of smoke or exhaust.
@@ -38,7 +37,7 @@ class SmokeParticle(pg.sprite.Sprite):
     scale(img, factor)
         Scales the given image by given factor then returns scaled surface image.
     """
-    def __init__(self, game, pos, vel):
+    def __init__(self, game:object, pos:vec, vel:vec):
         """
         Args
         ----
@@ -148,7 +147,7 @@ class Explotion(pg.sprite.Sprite):
     _frame_step()
         Method that changes the frame if a certain amount of time has passed (0.1s). Therefore the explotion lasts for a total of 0.1 * len(images) seconds.
     """
-    def __init__(self, game, pos):
+    def __init__(self, game:object, pos:vec):
         """
         Args
         ----
@@ -171,7 +170,7 @@ class Explotion(pg.sprite.Sprite):
         # set current frame to 0.
         self.frame = 0
 
-    def update(self, *args):
+    def update(self, *args:any):
         """ Method for updating each image to use in animation. Also kills sprite and removes object from all sprite groups. 
         
         Args:
@@ -235,7 +234,7 @@ class LaserBeam(pg.sprite.Sprite):
         Method to rotate the image given a image and an angle.
     """
     def __init__(self,
-            sender:Player,
+            sender:object,
             game:object,
             pos: vec,
             direction: int
